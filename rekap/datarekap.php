@@ -1,15 +1,26 @@
 <?php
 include_once("../connect.php");
 
-$search = isset($_POST['search']) ? $_POST['search'] : '';
-$sort = isset($_POST['sort']) ? $_POST['sort'] : '';
+$minUsia = isset($_POST['minUsia']) ? $_POST['minUsia'] : '';
+$maxUsia = isset($_POST['maxUsia']) ? $_POST['maxUsia'] : '';
+$minPendapatan = isset($_POST['minPendapatan']) ? $_POST['minPendapatan'] : '';
+$maxPendapatan = isset($_POST['maxPendapatan']) ? $_POST['maxPendapatan'] : '';
+$pendidikan = isset($_POST['pendidikan']) ? $_POST['pendidikan'] : '';
 
-if (!empty($search) && !empty($sort)) {
-  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk WHERE name LIKE '%$search%' INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi ORDER BY $sort ASC");
-} elseif (!empty($search) && empty($sort)) {
-  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE nama LIKE '%$search%' OR alamat LIKE '%$search%' OR provinsi LIKE '%$search%' OR telp LIKE '%$search%'");
-} elseif (empty($search) && !empty($sort)) {
-  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi ORDER BY $sort ASC");
+if (!empty($minUsia) || !empty($maxUsia) && !empty($minPendapatan) || !empty($maxPendapatan) && !empty($pendidikan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE usia >= $minUsia AND usia <= $maxUsia AND pendapatan >= $minPendapatan AND pendapatan <= $maxPendapatan AND tingkat_pendidikan LIKE '%$pendidikan%' ORDER BY id_penduduk ASC");
+} elseif (!empty($minUsia) || !empty($maxUsia) && !empty($minPendapatan) || !empty($maxPendapatan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE usia >= $minUsia AND usia <= $maxUsia AND pendapatan >= $minPendapatan AND pendapatan <= $maxPendapatan ORDER BY id_penduduk ASC");
+} elseif (!empty($minUsia) || !empty($maxUsia) && !empty($pendidikan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE usia >= $minUsia AND usia <= $maxUsia AND tingkat_pendidikan LIKE '%$pendidikan%' ORDER BY id_penduduk ASC");
+} elseif (!empty($minPendapatan) || !empty($maxPendapatan) && !empty($pendidikan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE pendapatan >= $minPendapatan AND pendapatan <= $maxPendapatan AND tingkat_pendidikan LIKE '%$pendidikan%' ORDER BY id_penduduk ASC");
+} elseif (!empty($minUsia) || !empty($maxUsia)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE usia >= $minUsia AND usia <= $maxUsia ORDER BY usia ASC");
+} elseif (!empty($minPendapatan) || !empty($maxPendapatan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE pendapatan >= $minPendapatan AND pendapatan <= $maxPendapatan ORDER BY pendapatan ASC");
+} elseif (!empty($pendidikan)) {
+  $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi WHERE tingkat_pendidikan LIKE '%$pendidikan%' ORDER BY id_penduduk ASC");
 } else {
   $data = mysqli_query($mysqli, "SELECT * FROM tb_penduduk INNER JOIN tb_provinsi ON tb_penduduk.id_provinsi = tb_provinsi.id_provinsi");
 }
@@ -56,11 +67,7 @@ foreach ($data as $row) {
   echo '<td>' . $row['tingkat_pendidikan'] . '</td>';
   echo '<td>' . $row['jenis_pekerjaan'] . '</td>';
   echo '<td>' . $row['keterangan'] . '</td>';
-  echo '<td>';
-  echo '<a href="#" onclick="showData(' . $row['id_penduduk'] . ')" data-toggle="tooltip" title="" class="btn btn-link btn-primary" data-original-title="Edit" style="margin-bottom: 5px; color: white;"><i class="fa-solid fa-eye"></i></a>';
-  echo '<a href="#" onclick="editData(' . $row['id_penduduk'] . ')" data-toggle="tooltip" title="" class="btn btn-link btn-primary" data-original-title="Edit" style="margin-bottom: 5px; color: white;"><i class="fa-solid fa-pencil"></i></a>';
-  echo '<a href="#" onclick="confirmDelete(' . $row['id_penduduk'] . ')" data-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Delete" style="margin-bottom: 5px; color: white;"><i class="fas fa-trash"></i></a>';
-  echo '</td>';
   echo '</tr>';
 }
+return
 $pdo = null;

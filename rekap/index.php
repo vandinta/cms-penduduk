@@ -28,67 +28,43 @@ include '../template/head.php';
 
       <div class="card" style="margin-top: 50px;">
         <div class="card-body">
-          <form action="insertdata.php" method="POST">
+          <form>
             <div class="modal-body">
               <div class="form-group">
-                <label>Nama</label>
-                <input type="text" name="nama" id="nama" class="form-control" placeholder="Nama" required>
-              </div>
-              <div class="form-group">
-                <label>Provinsi</label><br>
-                <select id="provinsi" name="provinsi" required>
-                  <option value="">Pilih Provinsi</option>
-                  <?php
-                  $data = mysqli_query($mysqli, "SELECT * FROM tb_provinsi");
-
-                  foreach ($data as $row) {
-                    echo '<option value="' . $row['id_provinsi'] . '">' . $row['provinsi'] . '</option>';
-                  }
-                  ?>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Kabupaten</label><br>
-                <select id="kabupaten" name="kabupaten" required>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>kecamatan</label><br>
-                <select id="kecamatan" name="kecamatan" required>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Alamat</label>
-                <input type="text" name="alamat" id="alamat" class="form-control" placeholder="Alamat" required>
-              </div>
-              <div class="form-group">
-                <label>Telp/Hp</label>
-                <input type="number" name="telp" id="telp" class="form-control" placeholder="Telp/Hp" required>
-              </div>
-              <div class="form-group">
-                <label>Tgl Lahir</label>
-                <input type="date" name="tgl_lahir" id="tgl_lahir" class="form-control" placeholder="Tgl Lahir" required>
+                <label>Usia</label>
+                <div class="row" style="margin-left: 2px;">
+                  <div class="coloum">
+                    <input type="number" name="minusia" id="minusia" class="form-control" placeholder="Batas Min Usia">
+                  </div>
+                  <div class="coloum" style="margin-top: 8px; margin-left: 20px;">
+                    <h6> - </h6>
+                  </div>
+                  <div class="coloum" style="margin-left: 20px;">
+                    <input type="number" name="maxusia" id="maxusia" class="form-control" placeholder="Batas Max Usia">
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <label>Pendapatan</label>
-                <input type="text" name="pendapatan" id="pendapatan" class="form-control" placeholder="Pendapatan" required>
+                <div class="row" style="margin-left: 2px;">
+                  <div class="coloum">
+                    <input type="number" name="minpendapatan" id="minpendapatan" class="form-control" placeholder="Batas Min Pendapatan">
+                  </div>
+                  <div class="coloum" style="margin-top: 8px; margin-left: 20px;">
+                    <h6> - </h6>
+                  </div>
+                  <div class="coloum" style="margin-left: 20px;">
+                    <input type="number" name="maxpendapatan" id="maxpendapatan" class="form-control" placeholder="Batas Max Pendapatan">
+                  </div>
+                </div>
               </div>
               <div class="form-group">
-                <label>Pendidikan</label>
-                <input type="text" name="tingkat_pendidikan" id="tingkat_pendidikan" class="form-control" placeholder="Pendidikan" required>
-              </div>
-              <div class="form-group">
-                <label>Pekerjaan</label>
-                <input type="text" name="jenis_pekerjaan" id="jenis_pekerjaan" class="form-control" placeholder="Pekerjaan" required>
-              </div>
-              <div class="form-group">
-                <label>Keterangan</label>
-                <input type="text" name="keterangan" id="keterangan" class="form-control" placeholder="Keterangan" required>
+                <label>Jenjang Pendidikan</label>
+                <input type="text" name="pendidikan" id="pendidikan" class="form-control" placeholder="Jenjang Pendidikan">
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" name="insertdata" class="btn btn-primary">Save Data</button>
+              <button type="button" id="rekap-button" class="btn btn-primary">Rekap</button>
             </div>
           </form>
         </div>
@@ -96,7 +72,7 @@ include '../template/head.php';
 
       <div class="card" style="margin-top: 50px;">
         <div class="card-body">
-          <table class="table table-bordered" style="text-align: center; margin-left: -14px;">
+          <table class="table table-bordered" style="text-align: center;">
             <thead>
               <tr>
                 <th scope="col">No</th>
@@ -131,13 +107,28 @@ include '../template/head.php';
       $(document).ready(function() {
         loadData();
 
+        $('#rekap-button').on('click', function() {
+          $("#minusia").val();
+          $("#maxusia").val();
+          loadData();
+        });
+
         function loadData() {
+          var minUsia = $("#minusia").val();
+          var maxUsia = $("#maxusia").val();
+          var minPendapatan = $("#minpendapatan").val();
+          var maxPendapatan = $("#maxpendapatan").val();
+          var pendidikan = $("#pendidikan").val();
+
           $.ajax({
-            url: 'datapenduduk.php',
+            url: 'datarekap.php',
             method: 'POST',
             data: {
-              search: searchData,
-              sort: sortData
+              minUsia,
+              maxUsia,
+              minPendapatan,
+              maxPendapatan,
+              pendidikan
             },
             success: function(response) {
               $('#data-container').html(response);
